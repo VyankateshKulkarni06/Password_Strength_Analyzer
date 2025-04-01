@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const { PwnedPassword } = require("../db/hibp_schema"); // Import the model
+const { PwnedPassword } = require("../../db/hibp_schema"); // Import the model
 
 // Function to check if a password exists in MongoDB
 async function isPasswordPwned(password) {

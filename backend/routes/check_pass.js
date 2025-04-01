@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const {  PasswordNGram } = require("../models"); // Your models
-const isPasswordPwned = require("../hibp_Check"); // Your pwned password check module
+const isPasswordPwned = require("../functions/hibp_Check"); // Your pwned password check module
 
 // Check if the password is pwned in MongoDB n-grams and in the pwned password database
 router.post("/", async (req, res) => {

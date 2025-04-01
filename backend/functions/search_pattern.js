@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { PwnedPassword, PasswordNGram } = require("../db/hibp_schema"); // Import models
+const { PwnedPassword, PasswordNGram } = require("../../db/hibp_schema"); // Import models
 
 // Function to generate n-grams
 function generateNGrams(hash, n = 4) {

@@ -1,8 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Landing from "./Landing";
-import Output from "./Output";
+// import Landing from "./Landing";
+// import Output from "./Output";
 
+const Landing = React.lazy(() => import("./Landing"));
+const Output = React.lazy(() => import("./Output"));
 const App = () => {
   return (
     <Router>

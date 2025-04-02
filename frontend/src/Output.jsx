@@ -1,51 +1,20 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom'; // Import useLocation
-import { Shield, AlertTriangle, Check, X, Clock, RefreshCw, Fingerprint, Eye, EyeOff, Search, Zap } from 'lucide-react';
-
-const defaultData = {
-  zxcvbn_output: {
-    password: "ExamplePassword123!",
-    sequence: [
-      { pattern: "dictionary", i: 0, j: 6, token: "Example", guesses: 50000, guesses_log10: 4.7 },
-      { pattern: "dictionary", i: 7, j: 13, token: "Password", guesses: 30000, guesses_log10: 4.5 },
-      { pattern: "sequence", i: 14, j: 16, token: "123", guesses: 100, guesses_log10: 2.0 },
-      { pattern: "bruteforce", i: 17, j: 17, token: "!", guesses: 10, guesses_log10: 1.0 }
-    ],
-    feedback: {
-      warning: "This is a commonly used password",
-      suggestions: ["Add more special characters", "Use a longer password", "Avoid common patterns"]
-    }
-  },
-  analyzer_output: {
-    score: 65,
-    strength_category: "Medium",
-    features: { length: 12, entropy: 3, upper: 1, lower: 10, digits: 3, special: 1, sequential: 1, repeats: 0, proximity: 0 },
-    time_to_crack: { online: "3 days", offline: "2 hours", bcrypt: "3 years", sha256: "1 month" }
-  },
-  pwned_output: { pwned: false, count: 0 }
-};
+import { useLocation } from 'react-router-dom';
+import { Shield, AlertTriangle, Check, X, Clock, RefreshCw, Fingerprint, Eye, EyeOff, Search, Zap, ArrowUpRight, Lightbulb, GitCompare, BadgeCheck } from 'lucide-react';
 
 const Output = () => {
-  const location = useLocation(); // Get the location object
-  const data = location.state?.data || defaultData; // Use passed data or fallback to defaultData
+  const location = useLocation();
+  const data = location.state?.data;
 
+  // State definitions
   const [isLoading, setIsLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [title, setTitle] = useState('');
+  const [showImprovedDetails, setShowImprovedDetails] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
 
-  const passwordData = useMemo(() => ({
-    password: data.zxcvbn_output?.password || defaultData.zxcvbn_output.password,
-    score: data.analyzer_output?.score || defaultData.analyzer_output.score,
-    strength_category: data.analyzer_output?.strength_category || defaultData.analyzer_output.strength_category,
-    features: data.analyzer_output?.features || defaultData.analyzer_output.features,
-    time_to_crack: data.analyzer_output?.time_to_crack || defaultData.analyzer_output.time_to_crack,
-    sequence: data.zxcvbn_output?.sequence || defaultData.zxcvbn_output.sequence,
-    isPwned: data.pwned_output?.pwned || defaultData.pwned_output.pwned,
-    pwnedCount: data.pwned_output?.count || defaultData.pwned_output.count,
-    feedback: data.zxcvbn_output?.feedback || defaultData.zxcvbn_output.feedback
-  }), [data]);
-
+  // Loading and animation effects
   useEffect(() => {
     const loadingTimer = setTimeout(() => setIsLoading(false), 1000);
     const animationTimer = setTimeout(() => setAnimationComplete(true), 2500);
@@ -70,6 +39,22 @@ const Output = () => {
     return () => clearInterval(interval);
   }, [isLoading]);
 
+  // Memoized password data extraction
+  const passwordData = useMemo(() => ({
+    password: data?.zxcvbn_output?.password,
+    score: data?.analyzer_output?.score,
+    strength_category: data?.analyzer_output?.strength_category,
+    features: data?.analyzer_output?.features,
+    time_to_crack: data?.analyzer_output?.time_to_crack,
+    sequence: data?.zxcvbn_output?.sequence,
+    isPwned: data?.pwned_output?.pwned,
+    pwnedCount: data?.pwned_output?.count,
+    feedback: data?.zxcvbn_output?.feedback,
+    suggestions: data?.suggester_output?.suggestions,
+    improvedPassword: data?.suggester_output?.improved_analysis
+  }), [data]);
+
+  // Helper functions for styling
   const getScoreColor = (score) => {
     if (score <= 25) return 'bg-red-500';
     if (score <= 50) return 'bg-orange-500';
@@ -77,22 +62,26 @@ const Output = () => {
     return 'bg-green-500';
   };
 
-  const getFeatureBarStyle = (value, max, type) => {
+  const getScoreTextColor = (score) => {
+    if (score <= 25) return 'text-red-500';
+    if (score <= 50) return 'text-orange-500';
+    if (score <= 75) return 'text-yellow-500';
+    return 'text-green-500';
+  };
+
+  const getFeatureBarStyle = (value, max) => {
     const percentage = Math.min((value / max) * 100, 100);
     let color = 'bg-blue-500';
-    if (type === 'sequential' || type === 'repeats' || type === 'proximity') {
-      color = value > 0 ? 'bg-red-500' : 'bg-green-500';
-    } else {
-      if (percentage < 30) color = 'bg-red-500';
-      else if (percentage < 60) color = 'bg-yellow-500';
-      else color = 'bg-green-500';
-    }
+    if (percentage < 30) color = 'bg-red-500';
+    else if (percentage < 60) color = 'bg-yellow-500';
+    else color = 'bg-green-500';
     return {
       width: animationComplete ? `${percentage}%` : '0%',
       className: `h-full ${color} transition-all duration-1000 ease-out rounded`
     };
   };
 
+  // Matrix effect for background animation
   const matrixEffect = useMemo(() => (
     <div className="matrix-code">
       {Array(10).fill().map((_, i) => (
@@ -113,12 +102,13 @@ const Output = () => {
     </div>
   ), []);
 
+  // Render functions
   const renderSequence = (sequence) => (
     <div className="bg-gray-900 p-4 rounded-md border border-gray-700 mb-6">
       <h2 className="text-xl mb-3 border-b border-green-800 pb-1 flex items-center">
         <Search className="mr-2" /> Pattern Analysis
       </h2>
-      {sequence.map((item, index) => (
+      {sequence?.map((item, index) => (
         <div key={index} className="mb-4 last:mb-0">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center">
@@ -144,7 +134,7 @@ const Output = () => {
             </div>
             <div className="mt-3 mb-1 text-xs text-gray-400">Character position:</div>
             <div className="flex mb-2">
-              {passwordData.password.split('').map((char, charIndex) => (
+              {passwordData.password?.split('').map((char, charIndex) => (
                 <div 
                   key={charIndex} 
                   className={`flex-1 p-2 text-center border ${
@@ -168,6 +158,124 @@ const Output = () => {
     </div>
   );
 
+  const renderImprovedPassword = () => {
+    if (!passwordData.improvedPassword) return null;
+    
+    return (
+      <div className="bg-gray-900 p-4 rounded-md border border-purple-900 mb-6 transition-all duration-500">
+        <h2 className="text-xl mb-3 border-b border-purple-800 pb-1 flex items-center justify-between">
+          <div className="flex items-center">
+            <ArrowUpRight className="mr-2 text-purple-400" /> 
+            <span className="text-purple-300">Improved Password</span>
+          </div>
+          <button 
+            onClick={() => setShowImprovedDetails(!showImprovedDetails)} 
+            className="text-purple-400 hover:text-purple-300 text-sm flex items-center"
+          >
+            {showImprovedDetails ? 'Hide Details' : 'Show Details'}
+          </button>
+        </h2>
+        
+        <div className="mb-4 bg-black bg-opacity-60 p-4 rounded-md border border-purple-800">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <Shield className="mr-2 text-purple-500" />
+              <span className="text-lg">Improved Password:</span>
+            </div>
+            <div className={`${getScoreTextColor(passwordData.improvedPassword.score)} font-bold`}>
+              {passwordData.improvedPassword.strength_category}
+            </div>
+          </div>
+          <div className="mt-2 font-bold text-xl tracking-wider text-purple-300">
+            {showPassword ? passwordData.improvedPassword.password : '•'.repeat(passwordData.improvedPassword.password.length)}
+          </div>
+          
+          <div className="mt-4">
+            <div className="flex justify-between mb-1">
+              <span>Security Score: {passwordData.improvedPassword.score}/100</span>
+            </div>
+            <div className="h-3 w-full bg-gray-800 rounded overflow-hidden">
+              <div 
+                className={`h-full ${getScoreColor(passwordData.improvedPassword.score)} transition-all duration-1000 ease-out`} 
+                style={{ width: animationComplete ? `${passwordData.improvedPassword.score}%` : '0%' }}
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        {showImprovedDetails && (
+          <div className="mt-4 bg-black bg-opacity-40 p-3 rounded border border-purple-900">
+            <h3 className="text-lg mb-3 flex items-center text-purple-400">
+              <Clock className="mr-2" /> Improved Time to Crack
+            </h3>
+            <div className="grid grid-cols-1 gap-3">
+              {passwordData.improvedPassword.time_to_crack && Object.entries(passwordData.improvedPassword.time_to_crack).map(([algorithm, time]) => (
+                <div key={algorithm} className="bg-black bg-opacity-40 p-2 rounded border border-gray-800">
+                  <div className="flex justify-between mb-1 text-sm">
+                    <span>{algorithm.charAt(0).toUpperCase() + algorithm.slice(1)}</span>
+                    <span className="text-purple-300">{time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <button 
+              onClick={() => setShowComparison(!showComparison)}
+              className="mt-4 bg-purple-900 hover:bg-purple-800 text-white px-4 py-2 rounded flex items-center w-full justify-center"
+            >
+              <GitCompare className="mr-2" />
+              {showComparison ? 'Hide Comparison' : 'Compare with Original'}
+            </button>
+            
+            {showComparison && (
+              <div className="mt-4 bg-black bg-opacity-60 p-3 rounded border border-gray-700">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-red-400 mb-2">Original</div>
+                    <div className="font-bold mb-1">{passwordData.score}/100</div>
+                    <div className="text-sm mb-2">{passwordData.strength_category}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-green-400 mb-2">Improved</div>
+                    <div className="font-bold mb-1">{passwordData.improvedPassword.score}/100</div>
+                    <div className="text-sm mb-2">{passwordData.improvedPassword.strength_category}</div>
+                  </div>
+                </div>
+                <div className="mt-2 h-2 w-full bg-gray-800 rounded overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-red-500 to-green-500" style={{ width: '100%' }}></div>
+                </div>
+                <div className="mt-4 text-xs text-gray-400 text-center">
+                  Security improvement: {Math.max(0, passwordData.improvedPassword.score - passwordData.score)}%
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderSuggestions = () => {
+    if (!passwordData.suggestions || passwordData.suggestions.length === 0) return null;
+    
+    return (
+      <div className="mb-6 bg-gray-900 p-4 rounded-md border border-blue-900">
+        <h2 className="text-xl mb-3 border-b border-blue-800 pb-1 flex items-center">
+          <Lightbulb className="mr-2 text-yellow-400" /> Password Improvement Suggestions
+        </h2>
+        <div className="space-y-3">
+          {passwordData.suggestions.map((suggestion, index) => (
+            <div key={index} className="bg-black bg-opacity-40 p-3 rounded border border-blue-800 flex items-start">
+              <BadgeCheck className="text-blue-400 mr-2 mt-1 flex-shrink-0" />
+              <p className="text-blue-200">{suggestion}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Main render
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-black p-4">
       <div className="w-full max-w-3xl bg-black text-green-500 p-6 rounded-lg shadow-lg font-mono border border-green-900 relative">
@@ -201,18 +309,20 @@ const Output = () => {
               </button>
             </div>
             <div className="mt-2 font-bold text-xl tracking-wider">
-              {showPassword ? passwordData.password : '•'.repeat(passwordData.password.length)}
+              {showPassword ? passwordData.password : '•'.repeat(passwordData.password?.length || 0)}
             </div>
           </div>
           
           <div className="mb-6">
             <div className="flex justify-between mb-2">
               <span>Security Score: {passwordData.score}/100</span>
-              <span className="text-red-400">{passwordData.strength_category}</span>
+              <span className={getScoreTextColor(passwordData.score)}>{passwordData.strength_category}</span>
             </div>
             <div className="h-4 w-full bg-gray-800 rounded overflow-hidden">
-              <div className={`h-full ${getScoreColor(passwordData.score)} transition-all duration-1000 ease-out`} 
-                   style={{ width: animationComplete ? `${passwordData.score}%` : '0%' }}></div>
+              <div 
+                className={`h-full ${getScoreColor(passwordData.score)} transition-all duration-1000 ease-out`} 
+                style={{ width: animationComplete ? `${passwordData.score}%` : '0%' }}
+              ></div>
             </div>
           </div>
           
@@ -221,11 +331,13 @@ const Output = () => {
               <AlertTriangle className="text-red-500 mr-2 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-red-400 font-bold">Password Breach Alert!</h3>
-                <p className="text-red-300">Appears in {passwordData.pwnedCount.toLocaleString()} breaches.</p>
+                <p className="text-red-300">Appears in {passwordData.pwnedCount?.toLocaleString()} breaches.</p>
               </div>
             </div>
           )}
           
+          {renderSuggestions()}
+          {renderImprovedPassword()}
           {renderSequence(passwordData.sequence)}
           
           <div className="mb-6">
@@ -234,23 +346,83 @@ const Output = () => {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Length</span>
-                  <span>{passwordData.features.length}/16</span>
+                  <span>{passwordData.features?.length}/16</span>
                 </div>
                 <div className="h-2 w-full bg-gray-800 rounded overflow-hidden">
-                  <div className={getFeatureBarStyle(passwordData.features.length, 16).className} 
-                       style={{ width: getFeatureBarStyle(passwordData.features.length, 16).width }}></div>
+                  <div 
+                    className={getFeatureBarStyle(passwordData.features?.length, 16).className} 
+                    style={{ width: getFeatureBarStyle(passwordData.features?.length, 16).width }}
+                  ></div>
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Entropy</span>
-                  <span>{passwordData.features.entropy}/5</span>
+                  <span>{passwordData.features?.entropy}/5</span>
                 </div>
                 <div className="h-2 w-full bg-gray-800 rounded overflow-hidden">
-                  <div className={getFeatureBarStyle(passwordData.features.entropy, 5).className} 
-                       style={{ width: getFeatureBarStyle(passwordData.features.entropy, 5).width }}></div>
+                  <div 
+                    className={getFeatureBarStyle(passwordData.features?.entropy, 5).className} 
+                    style={{ width: getFeatureBarStyle(passwordData.features?.entropy, 5).width }}
+                  ></div>
                 </div>
               </div>
+              {passwordData.features?.upper !== undefined && (
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Uppercase</span>
+                    <span>{passwordData.features.upper}/3</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-800 rounded overflow-hidden">
+                    <div 
+                      className={getFeatureBarStyle(passwordData.features.upper, 3).className} 
+                      style={{ width: getFeatureBarStyle(passwordData.features.upper, 3).width }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+              {passwordData.features?.lower !== undefined && (
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Lowercase</span>
+                    <span>{passwordData.features.lower}/5</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-800 rounded overflow-hidden">
+                    <div 
+                      className={getFeatureBarStyle(passwordData.features.lower, 5).className} 
+                      style={{ width: getFeatureBarStyle(passwordData.features.lower, 5).width }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+              {passwordData.features?.digits !== undefined && (
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Digits</span>
+                    <span>{passwordData.features.digits}/3</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-800 rounded overflow-hidden">
+                    <div 
+                      className={getFeatureBarStyle(passwordData.features.digits, 3).className} 
+                      style={{ width: getFeatureBarStyle(passwordData.features.digits, 3).width }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+              {passwordData.features?.special !== undefined && (
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Special Chars</span>
+                    <span>{passwordData.features.special}/3</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-800 rounded overflow-hidden">
+                    <div 
+                      className={getFeatureBarStyle(passwordData.features.special, 3).className} 
+                      style={{ width: getFeatureBarStyle(passwordData.features.special, 3).width }}
+                    ></div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           
@@ -259,7 +431,7 @@ const Output = () => {
               <Clock className="mr-2" /> Time to Crack
             </h2>
             <div className="grid grid-cols-1 gap-3">
-              {Object.entries(passwordData.time_to_crack).map(([algorithm, time]) => (
+              {passwordData.time_to_crack && Object.entries(passwordData.time_to_crack).map(([algorithm, time]) => (
                 <div key={algorithm} className="bg-black bg-opacity-40 p-3 rounded border border-gray-800">
                   <div className="flex justify-between mb-2 text-sm">
                     <span>{algorithm.charAt(0).toUpperCase() + algorithm.slice(1)}</span>
@@ -268,8 +440,8 @@ const Output = () => {
                   <div className="h-2 w-full bg-gray-800 rounded overflow-hidden">
                     <div 
                       className="h-full bg-red-500 transition-all duration-1500 ease-out rounded" 
-                      style={{ width: animationComplete ? '100%' : '0%', transitionDelay: '500ms' }}>
-                    </div>
+                      style={{ width: animationComplete ? '100%' : '0%', transitionDelay: '500ms' }}
+                    ></div>
                   </div>
                 </div>
               ))}
@@ -280,7 +452,7 @@ const Output = () => {
             <h2 className="text-xl mb-3 flex items-center text-yellow-400">
               <AlertTriangle className="mr-2" /> Security Warnings
             </h2>
-            {passwordData.feedback.warning && (
+            {passwordData.feedback?.warning && (
               <div className="mb-3 flex items-start">
                 <X className="text-red-500 mr-2 mt-1 flex-shrink-0" />
                 <p>{passwordData.feedback.warning}</p>
@@ -290,7 +462,7 @@ const Output = () => {
               <Check className="mr-2" /> Suggestions
             </h3>
             <ul className="list-disc pl-8 space-y-1">
-              {passwordData.feedback.suggestions.map((suggestion, index) => (
+              {passwordData.feedback?.suggestions?.map((suggestion, index) => (
                 <li key={index} className="text-blue-300">{suggestion}</li>
               ))}
             </ul>

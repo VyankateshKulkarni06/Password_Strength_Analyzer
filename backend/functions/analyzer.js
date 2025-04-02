@@ -13,4 +13,17 @@ async function analyzer(password) {
     }
 }
 
-module.exports = analyzer;
+async function suggester(password){
+    try {
+        const response = await axios.post("https://password-analyzer-api.onrender.com/improve_password/", {
+            password: password 
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error suggesting password:", error);
+        return { error: "Failed to suggest password" };
+    }
+}
+
+module.exports = {analyzer,suggester};

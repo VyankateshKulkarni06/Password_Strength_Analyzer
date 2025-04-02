@@ -1,7 +1,7 @@
 const router=require("express").Router();
 const  isPasswordPwned=require("../functions/hibp_Check");
 const zxcvbn =require("zxcvbn");
-const analyzer=require("../functions/analyzer");
+const {analyzer,suggester}=require("../functions/analyzer");
 router.post("/",async(req,res)=>{
     const password=req.body.password;
 
@@ -10,7 +10,8 @@ router.post("/",async(req,res)=>{
     {
         console.log("done pwned");
     }
-    
+
+    const suggester_output=await suggester(password);
     const analyzer_output=await analyzer(password);
     if(analyzer_output)
     {
@@ -21,6 +22,7 @@ router.post("/",async(req,res)=>{
 
     res.json({
         analyzer_output,
+        suggester_output,
         pwned_output,
         zxcvbn_output,
     });

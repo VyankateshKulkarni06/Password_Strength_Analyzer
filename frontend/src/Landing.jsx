@@ -7,7 +7,7 @@ import handleClick from '../functional_logic/handle_click';
 const Landing = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [Password, setPassword] = useState("");
+  const [password, setPassword] = useState(""); // Renamed to 'password'
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -18,9 +18,9 @@ const Landing = () => {
   }, []);
 
   const handleSubmit = async () => {
-    const data = await handleClick(Password); // Fixed case sensitivity
+    const data = await handleClick(password); // Pass the entered password
     if (data) {
-      navigate("/output", { state: { data } });
+      navigate("/output", { state: { data } }); // Pass data to Output
     }
   };
 
@@ -94,7 +94,7 @@ const Landing = () => {
                   type={showPassword ? "text" : "password"} 
                   placeholder="Enter your password" 
                   autoComplete="current-password"
-                  value={Password}
+                  value={password}
                   onChange={handlePasswordChange}
                   className="w-full py-2 pl-10 pr-10 bg-black border border-green-500 border-opacity-30 rounded text-white focus:outline-none focus:ring-1 focus:ring-green-500"
                 />

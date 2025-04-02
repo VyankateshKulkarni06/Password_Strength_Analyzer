@@ -1,13 +1,17 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Landing from "./Landing";
-// import Output from "./Output";
+import Output from "./Output";
 
 const App = () => {
   return (
     <Router>
       <Routes>
+        {/* Landing page (default route) */}
         <Route path="/" element={<Landing />} />
+        
+        {/* Output page */}
+        <Route path="/output" element={<Output />} />
       </Routes>
     </Router>
   );

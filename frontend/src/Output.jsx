@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import { Shield, AlertTriangle, Check, X, Clock, RefreshCw, Fingerprint, Eye, EyeOff, Search, Zap } from 'lucide-react';
 
 const defaultData = {
@@ -24,23 +25,25 @@ const defaultData = {
   pwned_output: { pwned: false, count: 0 }
 };
 
-const PasswordStrengthVisualizer = ({ data }) => {
+const Output = () => {
+  const location = useLocation(); // Get the location object
+  const data = location.state?.data || defaultData; // Use passed data or fallback to defaultData
+
   const [isLoading, setIsLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [title, setTitle] = useState('');
 
-  const mergedData = data || defaultData;
   const passwordData = useMemo(() => ({
-    password: mergedData.zxcvbn_output?.password || defaultData.zxcvbn_output.password,
-    score: mergedData.analyzer_output?.score || defaultData.analyzer_output.score,
-    strength_category: mergedData.analyzer_output?.strength_category || defaultData.analyzer_output.strength_category,
-    features: mergedData.analyzer_output?.features || defaultData.analyzer_output.features,
-    time_to_crack: mergedData.analyzer_output?.time_to_crack || defaultData.analyzer_output.time_to_crack,
-    sequence: mergedData.zxcvbn_output?.sequence || defaultData.zxcvbn_output.sequence,
-    isPwned: mergedData.pwned_output?.pwned || defaultData.pwned_output.pwned,
-    pwnedCount: mergedData.pwned_output?.count || defaultData.pwned_output.count,
-    feedback: mergedData.zxcvbn_output?.feedback || defaultData.zxcvbn_output.feedback
+    password: data.zxcvbn_output?.password || defaultData.zxcvbn_output.password,
+    score: data.analyzer_output?.score || defaultData.analyzer_output.score,
+    strength_category: data.analyzer_output?.strength_category || defaultData.analyzer_output.strength_category,
+    features: data.analyzer_output?.features || defaultData.analyzer_output.features,
+    time_to_crack: data.analyzer_output?.time_to_crack || defaultData.analyzer_output.time_to_crack,
+    sequence: data.zxcvbn_output?.sequence || defaultData.zxcvbn_output.sequence,
+    isPwned: data.pwned_output?.pwned || defaultData.pwned_output.pwned,
+    pwnedCount: data.pwned_output?.count || defaultData.pwned_output.count,
+    feedback: data.zxcvbn_output?.feedback || defaultData.zxcvbn_output.feedback
   }), [data]);
 
   useEffect(() => {
@@ -168,7 +171,6 @@ const PasswordStrengthVisualizer = ({ data }) => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-black p-4">
       <div className="w-full max-w-3xl bg-black text-green-500 p-6 rounded-lg shadow-lg font-mono border border-green-900 relative">
-        {/* Ensure all content stays above the matrix effect */}
         <div className="relative z-10">
           {isLoading && (
             <div className="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center z-20 rounded-lg">
@@ -295,12 +297,10 @@ const PasswordStrengthVisualizer = ({ data }) => {
           </div>
         </div>
         
-        {/* Matrix effect as background */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-10 z-0">
           {matrixEffect}
         </div>
 
-        {/* Inline CSS for matrix effect */}
         <style>{`
           .matrix-code {
             position: absolute;
@@ -338,4 +338,4 @@ const PasswordStrengthVisualizer = ({ data }) => {
   );
 };
 
-export default PasswordStrengthVisualizer;
+export default Output;

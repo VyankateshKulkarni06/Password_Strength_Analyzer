@@ -8,6 +8,7 @@ router.post("/", async (req, res) => {
             if (!password) return res.status(400).json({ error: "Password is required" });
 
             const result = await isPasswordPwned(password);
+            res.send(result);
             if(result.pwned==true)
             {
                 return res.json(`❌ Password is PWNED! Found ${result.count} times.`)

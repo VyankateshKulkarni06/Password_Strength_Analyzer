@@ -1,4 +1,4 @@
-import pymongo
+import pymongo 
 from pymongo import MongoClient
 
 # MongoDB connection

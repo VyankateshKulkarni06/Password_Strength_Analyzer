@@ -1,0 +1,39 @@
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes matrixDrop {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(1000%); }
+  }
+  
+  @keyframes flicker {
+    0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+      opacity: 0.99;
+    }
+    20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+      opacity: 0.4;
+    }
+  }
+  
+  .matrix-code {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .matrix-line {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    animation: matrixDrop linear infinite;
+  }
+  
+  .matrix-line span {
+    font-size: 14px;
+    animation: flicker infinite;
+  }

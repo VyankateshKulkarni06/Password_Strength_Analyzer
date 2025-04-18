@@ -34,6 +34,7 @@ const Landing = () => {
         opacityTimers.push(timer);
       }
     }
+    
 
     return () => {
       clearTimeout(taglineTimer);
@@ -499,8 +500,7 @@ const Landing = () => {
               <span className="inline-block" style={{ animationDelay: '0.9s' }}>r</span>
               <span className="inline-block" style={{ animationDelay: '1.0s' }}>s</span>
               <span className="inline-block" style={{ animationDelay: '1.1s' }}>e</span>
-              <span className="inline-block" style={{ animationDelay: '1.2s' }}>r</span>
-              <span className="inline-block" style={{ animationDelay: '1.3s' }}>s</span>
+
             </h1>
             <div 
               className="mx-auto max-w-2xl"

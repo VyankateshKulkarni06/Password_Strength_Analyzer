@@ -53,6 +53,8 @@ const Landing = () => {
 
   const handleSubmit = async () => {
     const data = await handleClick(password);
+    console.log("data",data);
+    localStorage.setItem("password",data);
     if (data) {
       navigate("/output", { state: { data } });
     }

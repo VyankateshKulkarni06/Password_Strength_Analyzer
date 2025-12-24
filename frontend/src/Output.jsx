@@ -165,7 +165,7 @@ const Output = () => {
   // Render functions
   const renderSequence = (sequence) => (
     <div className="bg-gray-900 p-4 rounded-md border border-gray-700 mb-6">
-      <h2 className="text-xl mb-3 border-b border-green-800 pb-1 flex items-center">
+      <h2 className="text-xl mb-3 border-b border-green-800 pb-1 flex items-center font-orbitron">
         <Search className="mr-2" /> Pattern Analysis
       </h2>
       {sequence?.map((item, index) => (
@@ -182,7 +182,7 @@ const Output = () => {
           <div className="bg-black bg-opacity-50 p-3 rounded border border-gray-800">
             <div className="flex justify-between mb-2">
               <span>Token:</span>
-              <code className="bg-gray-900 px-2 py-1 rounded text-green-400">{item.token}</code>
+              <code className="bg-gray-900 px-2 py-1 rounded text-green-400 font-mono">{item.token}</code>
             </div>
             <div className="flex justify-between mb-2">
               <span>Guesses required:</span>
@@ -223,7 +223,7 @@ const Output = () => {
     
     return (
       <div className="bg-gray-900 p-4 rounded-md border border-purple-900 mb-6 transition-all duration-500">
-        <h2 className="text-xl mb-3 border-b border-purple-800 pb-1 flex items-center justify-between">
+        <h2 className="text-xl mb-3 border-b border-purple-800 pb-1 flex items-center justify-between font-orbitron">
           <div className="flex items-center">
             <ArrowUpRight className="mr-2 text-purple-400" /> 
             <span className="text-purple-300">Improved Password</span>
@@ -240,7 +240,7 @@ const Output = () => {
           <div className="flex justify-between items-center mb-2">
             <span>Password:</span>
             <div className="flex items-center">
-              <code className="bg-purple-900 bg-opacity-40 px-2 py-1 rounded text-purple-300">
+              <code className="bg-purple-900 bg-opacity-40 px-2 py-1 rounded text-purple-300 font-mono">
                 {showPassword ? passwordData.improvedPassword.password : '•'.repeat(passwordData.improvedPassword.password.length)}
               </code>
               <button 
@@ -262,7 +262,7 @@ const Output = () => {
 
         {showImprovedDetails && (
           <div className="mt-4 bg-black bg-opacity-40 p-3 rounded border border-purple-900">
-            <h3 className="text-lg mb-3 flex items-center text-purple-400">
+            <h3 className="text-lg mb-3 flex items-center text-purple-400 font-orbitron">
               <Clock className="mr-2" /> Time to Crack
             </h3>
             <div className="grid grid-cols-1 gap-3">
@@ -325,7 +325,7 @@ const Output = () => {
     
     return (
       <div className="mb-6 bg-gray-900 p-4 rounded-md border border-blue-900">
-        <h2 className="text-xl mb-3 border-b border-blue-800 pb-1 flex items-center">
+        <h2 className="text-xl mb-3 border-b border-blue-800 pb-1 flex items-center font-orbitron">
           <Lightbulb className="mr-2 text-yellow-400" /> Password Improvement Suggestions
         </h2>
         <div className="space-y-3">
@@ -346,14 +346,14 @@ const Output = () => {
     const features = passwordData.features;
     return (
       <div className="mb-6 bg-gray-900 bg-opacity-60 p-4 rounded-md border border-gray-800">
-        <h3 className="text-lg mb-4 flex items-center">
+        <h3 className="text-lg mb-4 flex items-center font-orbitron">
           <span className="text-green-400">Password Composition</span>
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-black bg-opacity-40 p-3 rounded border border-gray-800">
             <div className="flex justify-between mb-1">
               <span>Length</span>
-              <span className="text-green-400">{features.length}</span>
+              <span className="text-green-400 font-mono">{features.length}</span>
             </div>
             <div className="h-2 bg-gray-800 rounded overflow-hidden">
               <div 
@@ -365,7 +365,7 @@ const Output = () => {
           <div className="bg-black bg-opacity-40 p-3 rounded border border-gray-800">
             <div className="flex justify-between mb-1">
               <span>Entropy</span>
-              <span className="text-blue-400">{features.entropy.toFixed(2)}</span>
+              <span className="text-blue-400 font-mono">{features.entropy.toFixed(2)}</span>
             </div>
             <div className="h-2 bg-gray-800 rounded overflow-hidden">
               <div 
@@ -377,25 +377,25 @@ const Output = () => {
           <div className="bg-black bg-opacity-40 p-3 rounded border border-gray-800">
             <div className="flex justify-between mb-1">
               <span>Uppercase</span>
-              <span className="text-purple-400">{features.upper}</span>
+              <span className="text-purple-400 font-mono">{features.upper}</span>
             </div>
           </div>
           <div className="bg-black bg-opacity-40 p-3 rounded border border-gray-800">
             <div className="flex justify-between mb-1">
               <span>Lowercase</span>
-              <span className="text-purple-400">{features.lower}</span>
+              <span className="text-purple-400 font-mono">{features.lower}</span>
             </div>
           </div>
           <div className="bg-black bg-opacity-40 p-3 rounded border border-gray-800">
             <div className="flex justify-between mb-1">
               <span>Digits</span>
-              <span className="text-yellow-400">{features.digits}</span>
+              <span className="text-yellow-400 font-mono">{features.digits}</span>
             </div>
           </div>
           <div className="bg-black bg-opacity-40 p-3 rounded border border-gray-800">
             <div className="flex justify-between mb-1">
               <span>Special</span>
-              <span className="text-yellow-400">{features.special}</span>
+              <span className="text-yellow-400 font-mono">{features.special}</span>
             </div>
           </div>
         </div>
@@ -443,7 +443,7 @@ const Output = () => {
             </div>
           )}
           
-          <h1 className="text-2xl mb-6 flex items-center">
+          <h1 className="text-2xl mb-6 flex items-center font-orbitron">
             <Fingerprint className="mr-2" />
             <span>{title}</span>
             {title === fullTitle ? null : <span className="animate-pulse">▌</span>}
@@ -497,7 +497,7 @@ const Output = () => {
           {renderPasswordComposition()}
           
           <div className="mb-6">
-            <h2 className="text-xl mb-3 border-b border-green-800 pb-1 flex items-center">
+            <h2 className="text-xl mb-3 border-b border-green-800 pb-1 flex items-center font-orbitron">
               <Clock className="mr-2" /> Time to Crack
             </h2>
             <div className="grid grid-cols-1 gap-3">

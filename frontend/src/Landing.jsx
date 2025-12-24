@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, Loader2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import "./App.css";
 import handleClick from '../functional_logic/handle_click';
@@ -11,6 +11,7 @@ const Landing = () => {
   const [showTagline, setShowTagline] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [cardOpacity, setCardOpacity] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Control sequential animation with smoother transitions
   useEffect(() => {
@@ -50,15 +51,25 @@ const Landing = () => {
   const handlePasswordChange = useCallback((e) => {
     setPassword(e.target.value);
   }, []);
-
-  const handleSubmit = async () => {
-    const data = await handleClick(password);
-    console.log("data",data);
-    localStorage.setItem("password",data);
-    if (data) {
-      navigate("/output", { state: { data } });
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!password) return;
+    
+    setIsLoading(true);
+    try {
+      const data = await handleClick(password);
+      console.log("data", data);
+      localStorage.setItem("password", data);
+      if (data) {
+        navigate("/output", { state: { data } });
+      }
+    } catch (error) {
+      console.error("Analysis failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   // Generate matrix-like characters: now includes alphabets, numbers and special characters
   const generateMatrixChar = () => {
@@ -486,7 +497,7 @@ const Landing = () => {
             }}
           >
             <h1 
-              className="text-4xl md:text-5xl font-bold text-green-500 mb-4"
+              className="text-4xl md:text-5xl font-bold text-green-500 mb-4 font-orbitron"
               style={{
                 animation: 'glowText 3s ease-in-out infinite'
               }}
@@ -571,7 +582,7 @@ const Landing = () => {
                   </svg>
                 </div>
                 <h2 
-                  className="text-2xl font-bold text-white mb-1"
+                  className="text-xl font-bold text-white mb-1 font-orbitron"
                   style={{
                     opacity: cardOpacity,
                     transform: `translateY(${10 - (cardOpacity * 10)}px)`,
@@ -596,6 +607,7 @@ const Landing = () => {
               
               <form 
                 className="space-y-6"
+                onSubmit={handleSubmit}
                 style={{
                   opacity: cardOpacity,
                   transition: 'opacity 0.8s ease-out',
@@ -627,7 +639,7 @@ const Landing = () => {
                       autoComplete="current-password"
                       value={password}
                       onChange={handlePasswordChange}
-                      className="w-full py-2 pl-10 pr-10 bg-black border border-green-500 border-opacity-30 rounded text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300 group-hover:border-green-400"
+                      className="w-full py-2 pl-10 pr-10 bg-black border border-green-500 border-opacity-30 rounded text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300 group-hover:border-green-400 font-mono"
                     />
                     <button
                       type="button"
@@ -640,13 +652,20 @@ const Landing = () => {
                   </div>
                   <p className="text-green-400 text-xs mt-2 opacity-80">Enter any password to test its security strength</p>
                 </div>
-                
                 <button 
-                  type="button"
-                  className="w-full py-2 px-4 bg-green-500 hover:bg-green-600 rounded text-black font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-                  onClick={handleSubmit}
+                  type="submit"
+                  className={`w-full py-2 px-4 bg-green-500 hover:bg-green-600 rounded text-black font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-orbitron tracking-wider flex items-center justify-center ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  disabled={isLoading}
                 >
-                  Analyze Password
+                
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2" size={20} />
+                      Analyzing...
+                    </>
+                  ) : (
+                    "Analyze Password"
+                  )}
                 </button>
                 
                 <div className="text-center text-xs text-green-300 opacity-60 pt-2">
